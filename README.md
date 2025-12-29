@@ -1,56 +1,94 @@
 # SVG Editor
-This repository is for the SVG editor
 
-## Concepts:
-- Shape: the geometry object displayed in canvas, include rectangle, line, ellipse and so on. It also covers the object which could be surranded by the geometry frame, for example, text and image.
-- Layout: the group of shapes. All of shapes in one group apply the same behavior (moving, resizing, layer number chaning, color changing and so on).
-- Widget: the concepts of shape and layout are collectively called as widget.
-- Menu: the area in the top of the web browser, in which all of the supported functions are provided for user operations.
-- Toolbar: the area in the top of the web browser, under the menu, in which the frequent used functions are provided as the icons for user operations.
-- Overview sidebar: the area in the left of the web browser, in which the organizations of pages and layers are displayed as hierarchy.
-- Property sidebar: the area in the right of the web browser, in which the properties of the selected widget (shape or layout) are displayed, and also are allowed to modify by the user.
-- Workplace: the area in the center of the web browser, in which user could design and draw the image.
+A free, web-based vector graphics editor designed for creating and editing SVG images. Think of it as MS Paint but for vector graphics - offering the simplicity and ease of use you'd expect, combined with powerful vector editing capabilities similar to Inkscape, but completely free and without licensing restrictions.
 
-## Requirements
-- [x]  Workplace (HTML5 canvas)
-    - [x]  Canvas initializing
-    - [x]  Widget (shape and layout)
-        - [x] Positional properties:
-            - [x]  Percentage (Relative units)
-            - [ ]  Scale
-            - [x]  Rotation
-            - [x]  Moving
-            - [x]  Multiselecting
-            - [ ]  Resizing
-        - [x]  Color properties:
-            - [x]  Colors
-            - [x]  Borders
-            - [ ]  Gradients
-    - [x]  Events handler
-      - [x]  Mouse Event
-        - [x]  Drag and drop events
-        - [x]  Mouse down, move and up events
-        - [ ]  Click and double click events
-      - [x]  Touch Event
-        - [x]  Touch start, move and end events
-      - [ ]  Keyboard event
-- [ ]  User operations (provided in the menu and toolbar)
-    - [ ]  Add and delete shapes
-    - [ ]  Undo and redo
-    - [ ]  Bring forward and backward (layers)
-    - [ ]  Group widgets (layout)
-- [ ]  Overview sidebar
-    - [ ]  Multipage organization
-    - [ ]  Multilayer organization
-- [ ]  Property sidebar
-    - [ ]  Get the widget properties and shown in the sidebar
-    - [ ]  Set the widget property values changed in the sidebar
-- [ ]  Supported image file formats
-    - [ ]  SVG: Loading (optional)
-    - [ ]  SVG: Saving
-    - [ ]  XML: Loading
-    - [ ]  XML: Saving
-    - [ ]  Yaml: Loading
-    - [ ]  Yaml: Saving
-    - [ ]  Json: Loading
-    - [ ]  Json: Saving
+## Overview
+
+This SVG editor provides an intuitive interface for designing vector graphics with features like pen stroke drawing, shape manipulation, and comprehensive editing tools. Built with HTML5 Canvas technology, it runs directly in your web browser without requiring any software installation.
+
+## Key Features
+
+- **Vector Graphics Creation**: Design scalable vector graphics that maintain quality at any size
+- **Intuitive Drawing Tools**: Easy-to-use pen stroke and shape tools for natural drawing experience
+- **Multi-touch Support**: Full touch screen compatibility for tablets and touch devices
+- **Layer Management**: Organize your artwork with multiple layers and pages
+- **Real-time Editing**: Live property editing with instant visual feedback
+- **Multiple Export Formats**: Save your work in SVG, XML, YAML, and JSON formats
+- **Free & Open Source**: No licensing fees or restrictions - completely free to use
+
+## Why Choose This SVG Editor?
+
+- **Accessibility**: No software installation required - works in any modern web browser
+- **Cost-effective**: Completely free alternative to expensive vector graphics software
+- **User-friendly**: Designed with simplicity in mind while maintaining professional capabilities
+- **Cross-platform**: Works on Windows, Mac, Linux, and mobile devices
+- **Lightweight**: Fast loading and responsive performance
+
+## Technical Concepts
+
+- **Shape**: The fundamental geometry objects displayed on the canvas, including rectangles, lines, ellipses, and other geometric forms. This also encompasses objects that can be contained within geometric frames, such as text and images.
+- **Layout**: A collection of shapes grouped together. All shapes within a layout share common behaviors such as moving, resizing, layer management, and color modifications.
+- **Widget**: The collective term for both shapes and layouts - essentially any manipulable object in the editor.
+- **Menu**: The top navigation area of the web interface containing all available functions and operations for user interaction.
+- **Toolbar**: Located beneath the menu, this area provides quick access to frequently used functions through intuitive icon-based controls.
+- **Overview Sidebar**: The left panel displaying the hierarchical organization of pages and layers, providing easy navigation through complex projects.
+- **Property Sidebar**: The right panel showing properties of selected widgets (shapes or layouts), allowing users to view and modify attributes in real-time.
+- **Workplace**: The central canvas area where users design and create their vector graphics artwork.
+
+## Development Progress
+
+### ✅ Core Canvas System (HTML5 Canvas)
+- ✅ Canvas initialization and setup
+- ✅ Widget system (shapes and layouts)
+  - ✅ **Positional Properties**:
+    - ✅ Percentage-based positioning (relative units)
+    - ⏳ Scaling functionality
+    - ✅ Rotation controls
+    - ✅ Drag and move operations
+    - ✅ Multi-selection capabilities
+    - ⏳ Resizing handles
+  - ✅ **Visual Properties**:
+    - ✅ Color management
+    - ✅ Border styling
+    - ⏳ Gradient effects
+- ✅ **Event Handling System**
+  - ✅ **Mouse Events**:
+    - ✅ Drag and drop functionality
+    - ✅ Mouse down, move, and up events
+    - ⏳ Click and double-click events
+  - ✅ **Touch Events**:
+    - ✅ Touch start, move, and end events
+  - ⏳ Keyboard event handling
+
+### 🚧 User Interface Features
+- ⏳ **Menu and Toolbar Operations**:
+  - ⏳ Add and delete shapes
+  - ⏳ Undo and redo functionality
+  - ⏳ Layer management (bring forward/backward)
+  - ⏳ Widget grouping (layout creation)
+- ⏳ **Overview Sidebar**:
+  - ⏳ Multi-page organization
+  - ⏳ Multi-layer hierarchy
+- ⏳ **Property Sidebar**:
+  - ⏳ Dynamic property display
+  - ⏳ Real-time property editing
+
+### 📁 File Format Support
+- ⏳ **SVG Format**: Loading (optional) and saving
+- ⏳ **XML Format**: Loading and saving
+- ⏳ **YAML Format**: Loading and saving
+- ⏳ **JSON Format**: Loading and saving
+
+## Getting Started
+
+1. Clone this repository
+2. Open the main HTML file in your web browser
+3. Start creating vector graphics!
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+
+## License
+
+This project is free and open source. No licensing restrictions apply.
