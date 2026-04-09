@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from math import pi, sin, cos, sqrt
 
-class ZAYAH:
+class Application:
 	def __init__(self):
 		#self.layout = TestElement([Len(220, 7), Len(230, 8), Len(70, 5), Len(-45, 9)], "green", (5, "silver"), pi/6, "https://www.online-image-editor.com/styles/2019/images/power_girl.png")
 		#self.layout = TestElement([Len(220, 7), Len(230, 8), Len(100, 5), Len(-19, 9)], "green", (1, "silver"), pi/6, "Hello world")
@@ -356,7 +356,7 @@ class TestLayout(LayoutBase, TestElement):
 	
 		
 if __name__ == "__main__":
-	window.addEventListener("load", ZAYAH().run())
+	window.addEventListener("load", Application().run())
 
 </script>
 </head>

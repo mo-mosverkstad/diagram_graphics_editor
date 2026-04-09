@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SVG Layout Engine</title>
+<style>
+  body { margin: 0; font-family: sans-serif; }
+  svg { border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+
+<svg id="mySVG" width="800" height="600"></svg>
+
+<script>
+const svgNS = "http://www.w3.org/2000/svg";
+
+// --- Primitive renderers ---
+const basicRender = {
+    rect: ({ x = 0, y = 0, width = 0, height = 0, fill = "black" }) => {
+        const el = document.createElementNS(svgNS, "rect");
+        el.setAttribute("x", x);
+        el.setAttribute("y", y);
+        el.setAttribute("width", width);
+        el.setAttribute("height", height);
+        el.setAttribute("fill", fill);
+        return el;
+    },
+
+    circle: ({ x = 0, y = 0, radius = 0, fill = "black" }) => {
+        const el = document.createElementNS(svgNS, "circle");
+        el.setAttribute("cx", x);
+        el.setAttribute("cy", y);
+        el.setAttribute("r", radius);
+        el.setAttribute("fill", fill);
+        return el;
+    },
+
+    line: ({ x1 = 0, y1 = 0, x2 = 0, y2 = 0, stroke = "black", strokeWidth = 1 }) => {
+        const el = document.createElementNS(svgNS, "line");
+        el.setAttribute("x1", x1);
+        el.setAttribute("y1", y1);
+        el.setAttribute("x2", x2);
+        el.setAttribute("y2", y2);
+        el.setAttribute("stroke", stroke);
+        el.setAttribute("stroke-width", strokeWidth);
+        return el;
+    },
+
+    ellipse: ({ x = 0, y = 0, rx = 0, ry = 0, fill = "black" }) => {
+        const el = document.createElementNS(svgNS, "ellipse");
+        el.setAttribute("cx", x);
+        el.setAttribute("cy", y);
+        el.setAttribute("rx", rx);
+        el.setAttribute("ry", ry);
+        el.setAttribute("fill", fill);
+        return el;
+    },
+
+    polygon: ({ points = [], fill = "black" }) => {
+        const el = document.createElementNS(svgNS, "polygon");
+        el.setAttribute(
+            "points",
+            points.map(p => `${p.x},${p.y}`).join(" ")
+        );
+        el.setAttribute("fill", fill);
+        return el;
+    },
+
+    polyline: ({ points = [], stroke = "black", strokeWidth = 1, fill = "none" }) => {
+        const el = document.createElementNS(svgNS, "polyline");
+        el.setAttribute(
+            "points",
+            points.map(p => `${p.x},${p.y}`).join(" ")
+        );
+        el.setAttribute("stroke", stroke);
+        el.setAttribute("stroke-width", strokeWidth);
+        el.setAttribute("fill", fill);
+        return el;
+    },
+
+    text: ({ x = 0, y = 0, text = "", fill = "black", alignmentBaseline = "auto"}) => {
+        const el = document.createElementNS(svgNS, "text");
+        el.setAttribute("x", x);
+        el.setAttribute("y", y);
+        el.setAttribute("fill", fill);
+        el.setAttribute("alignment-baseline", alignmentBaseline);
+        el.textContent = text;
+        return el;
+    },
+};
+
+// --- Renderer ---
+function createRenderer(svg, AST) {
+    const defsMap = Object.fromEntries(
+        (AST.defs || []).map(d => [d.type, d])
+    );
+
+    function resolveProps(template, scope) {
+        const out = {};
+        for (let key in template) {
+            if (key === "type") continue;
+            const val = template[key];
+            out[key] =
+                (typeof val === "string" && val in scope)
+                    ? scope[val]
+                    : val;
+        }
+        return out;
+    }
+
+    function renderNode(node, rootNode, scope = {}, parentOffset = { x: 0, y: 0 }) {
+        const { type, props = {}, children = [] } = node;
+
+        const localX = props.x ?? 0;
+        const localY = props.y ?? 0;
+
+        const offset = {
+            x: parentOffset.x + localX,
+            y: parentOffset.y + localY
+        };
+
+        // --- Custom component ---
+        if (defsMap[type]) {
+            const def = defsMap[type];
+            const merged = { ...def.props, ...props };
+
+            const g = document.createElementNS(svgNS, "g");
+
+            const childrenEls = def.layout.flatMap(child =>
+                renderNode(
+                    {
+                        type: child.type,
+                        props: resolveProps(child, merged)
+                    },
+                    node,
+                    merged,
+                    parentOffset
+                )
+            );
+
+            childrenEls.forEach(el => g.appendChild(el));
+            g.__rootNode = node;
+
+            return [g];
+        }
+
+        // --- GROUP ---
+        if (type === "group") {
+            const g = document.createElementNS(svgNS, "g");
+
+            const childrenEls = children.flatMap(child =>
+                renderNode(child, rootNode || node, scope, offset)
+            );
+
+            childrenEls.forEach(el => g.appendChild(el));
+            g.__rootNode = rootNode || node;
+
+            return [g];
+        }
+
+        // --- TABLE ---
+        if (type === "table") {
+            const {
+                rows = 1,
+                cols = 1,
+                cellWidth = 50,
+                cellHeight = 50,
+                gap = 0
+            } = props;
+
+            const g = document.createElementNS(svgNS, "g");
+            let index = 0;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (!children[index]) continue;
+
+                    const child = children[index++];
+
+                    const cellOffset = {
+                        x: offset.x + c * (cellWidth + gap),
+                        y: offset.y + r * (cellHeight + gap)
+                    };
+
+                    const childEls = renderNode(
+                        child,
+                        rootNode || node,
+                        scope,
+                        cellOffset
+                    );
+
+                    childEls.forEach(el => g.appendChild(el));
+                }
+            }
+
+            g.__rootNode = rootNode || node;
+            return [g];
+        }
+
+        // --- Primitive ---
+        if (!basicRender[type]) {
+            console.warn("Unknown type:", type);
+            return [];
+        }
+
+        let finalProps = { ...props };
+
+        // Apply offset depending on primitive
+        if (type === "line") {
+            finalProps.x1 = (props.x1 ?? 0) + offset.x;
+            finalProps.y1 = (props.y1 ?? 0) + offset.y;
+            finalProps.x2 = (props.x2 ?? 0) + offset.x;
+            finalProps.y2 = (props.y2 ?? 0) + offset.y;
+        } else if (type === "polygon" || type === "polyline") {
+            finalProps.points = (props.points || []).map(p => ({
+                x: p.x + offset.x,
+                y: p.y + offset.y
+            }));
+        } else {
+            finalProps.x = offset.x;
+            finalProps.y = offset.y;
+        }
+
+        const el = basicRender[type](finalProps);
+        el.__rootNode = rootNode || node;
+
+        return [el];
+    }
+
+    function render() {
+        svg.innerHTML = "";
+
+        const elements = AST.components
+            .flatMap(node => renderNode(node, node));
+
+        elements.forEach(el => svg.appendChild(el));
+    }
+
+    return { render };
+}
+
+// --- Dragging ---
+function enableDragging(svg, renderer) {
+    let selected = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function getAnchor(node) {
+        const p = node.props;
+
+        if ("x" in p || "y" in p) {
+            return { x: p.x ?? 0, y: p.y ?? 0 };
+        }
+
+        // line fallback
+        if ("x1" in p && "y1" in p) {
+            return { x: p.x1, y: p.y1 };
+        }
+
+        // polygon/polyline fallback
+        if (p.points && p.points.length) {
+            return { x: p.points[0].x, y: p.points[0].y };
+        }
+
+        return { x: 0, y: 0 };
+    }
+
+    svg.addEventListener("mousedown", (e) => {
+        const target = e.target;
+        if (!target.__rootNode) return;
+
+        selected = target.__rootNode;
+
+        const { x, y } = getAnchor(selected);
+
+        offsetX = e.offsetX - x;
+        offsetY = e.offsetY - y;
+    });
+
+    svg.addEventListener("mousemove", (e) => {
+        if (!selected) return;
+
+        const p = selected.props;
+        const newX = e.offsetX - offsetX;
+        const newY = e.offsetY - offsetY;
+
+        // --- NORMAL SHAPES ---
+        if ("x" in p || "y" in p) {
+            p.x = newX;
+            p.y = newY;
+        }
+
+        // --- LINE ---
+        else if ("x1" in p && "x2" in p) {
+            const dx = newX - p.x1;
+            const dy = newY - p.y1;
+
+            p.x1 += dx;
+            p.y1 += dy;
+            p.x2 += dx;
+            p.y2 += dy;
+        }
+
+        // --- POLYGON / POLYLINE ---
+        else if (p.points) {
+            const dx = newX - p.points[0].x;
+            const dy = newY - p.points[0].y;
+
+            p.points = p.points.map(pt => ({
+                x: pt.x + dx,
+                y: pt.y + dy
+            }));
+        }
+
+        renderer.render();
+    });
+
+    svg.addEventListener("mouseup", () => selected = null);
+    svg.addEventListener("mouseleave", () => selected = null);
+}
+
+// ==== AST ====
+const AST = {
+    defs: [
+        {
+            type: "button",
+            props: { x: 0, y: 0, width: 120, height: 40, text: "Btn" },
+            layout: [
+                { type: "rect", x: "x", y: "y", width: "width", height: "height", fill: "lightgray" },
+                { type: "text", x: "x", y: "y", text: "text", fill: "black", alignmentBaseline: "hanging" }
+            ]
+        }
+    ],
+
+    components: [
+        // Basic shapes
+        { type: "circle", props: { x: 100, y: 100, radius: 40, fill: "blue" } },
+
+        // GROUP demo
+        {
+            type: "group",
+            props: { x: 200, y: 100 },
+            children: [
+                { type: "rect", props: { width: 100, height: 50, fill: "green" } },
+                { type: "circle", props: { x: 120, y: 25, radius: 20, fill: "orange" } }
+            ]
+        },
+
+        // TABLE demo
+        {
+            type: "table",
+            props: {
+                x: 100,
+                y: 250,
+                rows: 2,
+                cols: 3,
+                cellWidth: 80,
+                cellHeight: 80,
+                gap: 10
+            },
+            children: [
+                { type: "rect", props: { width: 60, height: 60, fill: "red" } },
+                { type: "rect", props: { width: 60, height: 60, fill: "blue" } },
+                { type: "circle", props: { radius: 25, fill: "orange" } },
+                { type: "circle", props: { radius: 25, fill: "purple" } },
+                { type: "circle", props: { radius: 25, fill: "black" } },
+                { type: "circle", props: { radius: 25, fill: "gray" } }
+            ]
+        },
+
+        // Component demo
+        { type: "button", props: { x: 400, y: 100, text: "Drag me!" } },
+        { type: "button", props: { x: 100, y: 100, text: "Drag me!" } },
+        { type: "line", props: {x1: 100, y1: 100, x2: 200, y2: 200}}
+    ]
+};
+
+// ==== INIT ====
+const svg = document.getElementById("mySVG");
+const renderer = createRenderer(svg, AST);
+
+renderer.render();
+enableDragging(svg, renderer);
+
+window.ast = AST;
+
+</script>
+
+</body>
+</html>
