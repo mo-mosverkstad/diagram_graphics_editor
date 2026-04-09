@@ -10,7 +10,11 @@ App.ReusableComponent = class ReusableComponent extends App.Shape {
     constructor({ template, ...overrides }) {
         super(overrides);
         this.template = template;
-        this.overrides = overrides;
+        this.overrides = {};
+        const shapeKeys = ["x", "y", "fill", "wrapWidth", "wrapHeight"];
+        for (const [k, v] of Object.entries(overrides)) {
+            if (!shapeKeys.includes(k)) this.overrides[k] = v;
+        }
     }
 
     _buildChildren() {
@@ -23,9 +27,9 @@ App.ReusableComponent = class ReusableComponent extends App.Shape {
         });
     }
 
-    _computeSize() {
+    _computeSize(children) {
         const layout = App._layouts[this.template];
-        const children = this._buildChildren();
+        children = children || this._buildChildren();
         let w = 0, h = 0;
 
         if (layout.direction === "vertical") {
@@ -48,7 +52,14 @@ App.ReusableComponent = class ReusableComponent extends App.Shape {
     render(offset) {
         const layout = App._layouts[this.template];
         const children = this._buildChildren();
-        this._computeSize();
+        this._computeSize(children);
+
+        if (this.wrapWidth || this.wrapHeight) {
+            for (const child of children) {
+                if (this.wrapWidth && child.width !== undefined) child.width = this.width;
+                if (this.wrapHeight && child.height !== undefined) child.height = this.height;
+            }
+        }
 
         const baseOffset = { x: offset.x + this.x, y: offset.y + this.y };
         const els = [];

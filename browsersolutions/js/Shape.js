@@ -83,7 +83,11 @@ class TextShape extends Shape {
         });
     }
 
-    getSize() { return { width: this.x, height: this.y + 16 }; }
+    _measureWidth() {
+        return this.text.length * 7.2;
+    }
+
+    getSize() { return { width: this.x + this._measureWidth(), height: this.y + 16 }; }
 }
 
 class Line extends Shape {

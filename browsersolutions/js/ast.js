@@ -1,9 +1,9 @@
 window.App = window.App || {};
 
 App.defineLayout("Button", {
-    params: { width: 120, height: 40, text: "Btn", fill: "lightgray" },
+    params: { width: 70, height: 10, text: "Btn", fill: "lightgray" },
     body: [
-        { type: "Rect", width: "$width", height: "$height", fill: "$fill" },
+        { type: "Rect", width: "$width", height: "$height", fill: "$fill"},
         { type: "TextShape", text: "$text", fill: "black", alignmentBaseline: "hanging" }
     ]
 });
@@ -32,7 +32,7 @@ App.components = [
         ]
     }),
 
-    new App.ReusableComponent({ template: "Button", x: 400, y: 100, text: "Drag me!" }),
-    new App.ReusableComponent({ template: "Button", x: 100, y: 100, text: "Drag me!" }),
+    new App.ReusableComponent({ template: "Button", x: 400, y: 100, text: "Drag me! More text more text.", wrapWidth: true}),
+    new App.ReusableComponent({ template: "Button", x: 100, y: 100, text: "Drag me! Button", wrapWidth: true, wrapHeight: true}),
     new App.Line({ x1: 100, y1: 100, x2: 200, y2: 200 })
 ];
