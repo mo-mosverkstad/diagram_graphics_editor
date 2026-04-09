@@ -34,26 +34,28 @@ class Group extends App.Shape {
 }
 
 class Table extends App.Shape {
-    constructor({ rows = 1, cols = 1, cellWidth = 50, cellHeight = 50, gap = 0, children = [], ...rest } = {}) {
+    constructor({ cellWidth = 50, cellHeight = 50, gap = 0, children = [[]], ...rest } = {}) {
         super(rest);
-        this.rows = rows;
-        this.cols = cols;
         this.cellWidth = cellWidth;
         this.cellHeight = cellHeight;
         this.gap = gap;
         this.children = children;
     }
 
+    get rows() { return this.children.length; }
+    get cols() { return Math.max(...this.children.map(r => r.length), 0); }
+
     _computeSize() {
+        const flat = this.children.flat();
         if (this.wrapWidth) {
             let maxW = 0;
-            for (const child of this.children) maxW = Math.max(maxW, child.getSize().width);
+            for (const child of flat) maxW = Math.max(maxW, child.getSize().width);
             this.cellWidth = maxW;
             this.width = this.cols * this.cellWidth + (this.cols - 1) * this.gap;
         }
         if (this.wrapHeight) {
             let maxH = 0;
-            for (const child of this.children) maxH = Math.max(maxH, child.getSize().height);
+            for (const child of flat) maxH = Math.max(maxH, child.getSize().height);
             this.cellHeight = maxH;
             this.height = this.rows * this.cellHeight + (this.rows - 1) * this.gap;
         }
@@ -64,12 +66,11 @@ class Table extends App.Shape {
         const baseX = offset.x + this.x;
         const baseY = offset.y + this.y;
         const els = [];
-        let index = 0;
 
         for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.cols; c++) {
-                if (!this.children[index]) continue;
-                const child = this.children[index++];
+            for (let c = 0; c < (this.children[r]?.length || 0); c++) {
+                const child = this.children[r][c];
+                if (!child) continue;
                 child.applyContainer(this.cellWidth, this.cellHeight);
                 const cellOffset = {
                     x: baseX + c * (this.cellWidth + this.gap),
