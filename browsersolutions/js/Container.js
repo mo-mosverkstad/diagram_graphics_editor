@@ -6,13 +6,30 @@ class Group extends App.Shape {
         this.children = children;
     }
 
+    _computeSize() {
+        let w = 0, h = 0;
+        for (const child of this.children) {
+            const s = child.getSize();
+            w = Math.max(w, s.width);
+            h = Math.max(h, s.height);
+        }
+        if (this.wrapWidth) this.width = w;
+        if (this.wrapHeight) this.height = h;
+    }
+
     render(offset) {
+        this._computeSize();
         const childOffset = { x: offset.x + this.x, y: offset.y + this.y };
         const els = this.children.flatMap(child => {
             const el = child.render(childOffset);
             return Array.isArray(el) ? el : [el];
         });
         return App.SvgHelper.createGroup(els, null);
+    }
+
+    getSize() {
+        this._computeSize();
+        return { width: this.x + (this.width || 0), height: this.y + (this.height || 0) };
     }
 }
 
@@ -27,7 +44,23 @@ class Table extends App.Shape {
         this.children = children;
     }
 
+    _computeSize() {
+        if (this.wrapWidth) {
+            let maxW = 0;
+            for (const child of this.children) maxW = Math.max(maxW, child.getSize().width);
+            this.cellWidth = maxW;
+            this.width = this.cols * this.cellWidth + (this.cols - 1) * this.gap;
+        }
+        if (this.wrapHeight) {
+            let maxH = 0;
+            for (const child of this.children) maxH = Math.max(maxH, child.getSize().height);
+            this.cellHeight = maxH;
+            this.height = this.rows * this.cellHeight + (this.rows - 1) * this.gap;
+        }
+    }
+
     render(offset) {
+        this._computeSize();
         const baseX = offset.x + this.x;
         const baseY = offset.y + this.y;
         const els = [];
@@ -47,6 +80,13 @@ class Table extends App.Shape {
             }
         }
         return App.SvgHelper.createGroup(els, null);
+    }
+
+    getSize() {
+        this._computeSize();
+        const w = this.width || (this.cols * this.cellWidth + (this.cols - 1) * this.gap);
+        const h = this.height || (this.rows * this.cellHeight + (this.rows - 1) * this.gap);
+        return { width: this.x + w, height: this.y + h };
     }
 }
 

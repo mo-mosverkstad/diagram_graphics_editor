@@ -1,14 +1,12 @@
 window.App = window.App || {};
 
-App.createButton = function({ x = 0, y = 0, width = 120, height = 40, text = "Btn" } = {}) {
-    return new App.Group({
-        x, y,
-        children: [
-            new App.Rect({ width, height, fill: "lightgray" }),
-            new App.TextShape({ text, fill: "black", alignmentBaseline: "hanging" })
-        ]
-    });
-};
+App.defineLayout("Button", {
+    params: { width: 120, height: 40, text: "Btn", fill: "lightgray" },
+    body: [
+        { type: "Rect", width: "$width", height: "$height", fill: "$fill" },
+        { type: "TextShape", text: "$text", fill: "black", alignmentBaseline: "hanging" }
+    ]
+});
 
 App.components = [
     new App.Circle({ x: 100, y: 100, radius: 40, fill: "blue" }),
@@ -34,7 +32,7 @@ App.components = [
         ]
     }),
 
-    App.createButton({ x: 400, y: 100, text: "Drag me!" }),
-    App.createButton({ x: 100, y: 100, text: "Drag me!" }),
+    new App.ReusableComponent({ template: "Button", x: 400, y: 100, text: "Drag me!" }),
+    new App.ReusableComponent({ template: "Button", x: 100, y: 100, text: "Drag me!" }),
     new App.Line({ x1: 100, y1: 100, x2: 200, y2: 200 })
 ];

@@ -15,6 +15,7 @@ class Shape {
     }
 
     render(offset) { throw new Error("Not implemented"); }
+    getSize() { return { width: 0, height: 0 }; }
     getAnchor() { return { x: this.x, y: this.y }; }
     applyDrag(newX, newY) { this.x = newX; this.y = newY; }
 }
@@ -32,6 +33,8 @@ class Rect extends Shape {
             width: this.width, height: this.height, fill: this.fill
         });
     }
+
+    getSize() { return { width: this.x + this.width, height: this.y + this.height }; }
 }
 
 class Circle extends Shape {
@@ -45,6 +48,8 @@ class Circle extends Shape {
             cx: offset.x + this.x, cy: offset.y + this.y, r: this.radius, fill: this.fill
         });
     }
+
+    getSize() { return { width: this.x + this.radius * 2, height: this.y + this.radius * 2 }; }
 }
 
 class Ellipse extends Shape {
@@ -59,6 +64,8 @@ class Ellipse extends Shape {
             cx: offset.x + this.x, cy: offset.y + this.y, rx: this.rx, ry: this.ry, fill: this.fill
         });
     }
+
+    getSize() { return { width: this.x + this.rx * 2, height: this.y + this.ry * 2 }; }
 }
 
 class TextShape extends Shape {
@@ -75,6 +82,8 @@ class TextShape extends Shape {
             textContent: this.text
         });
     }
+
+    getSize() { return { width: this.x, height: this.y + 16 }; }
 }
 
 class Line extends Shape {
@@ -103,6 +112,8 @@ class Line extends Shape {
         this.x1 += dx; this.y1 += dy;
         this.x2 += dx; this.y2 += dy;
     }
+
+    getSize() { return { width: Math.max(this.x1, this.x2), height: Math.max(this.y1, this.y2) }; }
 }
 
 class Polygon extends Shape {
@@ -121,6 +132,13 @@ class Polygon extends Shape {
     applyDrag(newX, newY) {
         const dx = newX - this.points[0].x, dy = newY - this.points[0].y;
         this.points = this.points.map(p => ({ x: p.x + dx, y: p.y + dy }));
+    }
+
+    getSize() {
+        return {
+            width: Math.max(...this.points.map(p => p.x)),
+            height: Math.max(...this.points.map(p => p.y))
+        };
     }
 }
 
@@ -145,6 +163,13 @@ class Polyline extends Shape {
     applyDrag(newX, newY) {
         const dx = newX - this.points[0].x, dy = newY - this.points[0].y;
         this.points = this.points.map(p => ({ x: p.x + dx, y: p.y + dy }));
+    }
+
+    getSize() {
+        return {
+            width: Math.max(...this.points.map(p => p.x)),
+            height: Math.max(...this.points.map(p => p.y))
+        };
     }
 }
 
