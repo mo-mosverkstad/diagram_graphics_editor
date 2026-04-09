@@ -5,17 +5,23 @@
 <title>SVG Layout Engine</title>
 <style>
   body { margin: 0; font-family: sans-serif; }
-  svg { border: 1px solid #ccc; }
+  svg, canvas { border: 1px solid #ccc; }
+  #toggleBackend { margin: 8px; padding: 4px 12px; cursor: pointer; }
 </style>
 </head>
 <body>
 
+<button id="toggleBackend"></button>
+<br>
 <svg id="mySVG" width="800" height="600"></svg>
+<canvas id="myCanvas" width="800" height="600" style="display:none"></canvas>
 
-<script src="js/SvgHelper.js"></script>
+<script src="js/RenderVisitor.js"></script>
 <script src="js/Shape.js"></script>
 <script src="js/Container.js"></script>
 <script src="js/ReusableComponent.js"></script>
+<script src="js/SvgRenderVisitor.js"></script>
+<script src="js/CanvasRenderVisitor.js"></script>
 <script src="js/Renderer.js"></script>
 <script src="js/DragHandler.js"></script>
 <script src="js/ast.js"></script>

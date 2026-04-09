@@ -17,15 +17,7 @@ class Group extends App.Shape {
         if (this.wrapHeight) this.height = h;
     }
 
-    render(offset) {
-        this._computeSize();
-        const childOffset = { x: offset.x + this.x, y: offset.y + this.y };
-        const els = this.children.flatMap(child => {
-            const el = child.render(childOffset);
-            return Array.isArray(el) ? el : [el];
-        });
-        return App.SvgHelper.createGroup(els, null);
-    }
+    accept(visitor, offset) { return visitor.visitGroup(this, offset); }
 
     getSize() {
         this._computeSize();
@@ -75,28 +67,7 @@ class Table extends App.Shape {
         }
     }
 
-    render(offset) {
-        this._computeSize();
-        const baseX = offset.x + this.x;
-        const baseY = offset.y + this.y;
-        const els = [];
-        let cy = 0;
-
-        for (let r = 0; r < this.rows; r++) {
-            let cx = 0;
-            for (let c = 0; c < (this.children[r]?.length || 0); c++) {
-                const child = this.children[r][c];
-                if (child) {
-                    child.applyContainer(this.colWidths[c], this.rowHeights[r]);
-                    const el = child.render({ x: baseX + cx, y: baseY + cy });
-                    els.push(...(Array.isArray(el) ? el : [el]));
-                }
-                cx += this.colWidths[c] + this.gap;
-            }
-            cy += this.rowHeights[r] + this.gap;
-        }
-        return App.SvgHelper.createGroup(els, null);
-    }
+    accept(visitor, offset) { return visitor.visitTable(this, offset); }
 
     getSize() {
         this._computeSize();

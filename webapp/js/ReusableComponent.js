@@ -49,32 +49,7 @@ App.ReusableComponent = class ReusableComponent extends App.Shape {
         if (this.wrapHeight) this.height = h;
     }
 
-    render(offset) {
-        const layout = App._layouts[this.template];
-        const children = this._buildChildren();
-        this._computeSize(children);
-
-        if (this.wrapWidth || this.wrapHeight) {
-            for (const child of children) {
-                if (this.wrapWidth && child.width !== undefined) child.width = this.width;
-                if (this.wrapHeight && child.height !== undefined) child.height = this.height;
-            }
-        }
-
-        const baseOffset = { x: offset.x + this.x, y: offset.y + this.y };
-        const els = [];
-        let cursorY = 0;
-
-        for (const child of children) {
-            const childOffset = { x: baseOffset.x, y: baseOffset.y + cursorY };
-            const el = child.render(childOffset);
-            els.push(...(Array.isArray(el) ? el : [el]));
-            if (layout.direction === "vertical") {
-                cursorY += child.getSize().height;
-            }
-        }
-        return App.SvgHelper.createGroup(els, null);
-    }
+    accept(visitor, offset) { return visitor.visitReusableComponent(this, offset); }
 
     getSize() {
         this._computeSize();

@@ -14,10 +14,11 @@ class Shape {
         if (this.wrapHeight) this.height = containerH;
     }
 
-    render(offset) { throw new Error("Not implemented"); }
+    accept(visitor, offset) { throw new Error("Not implemented"); }
     getSize() { return { width: 0, height: 0 }; }
     getAnchor() { return { x: this.x, y: this.y }; }
     applyDrag(newX, newY) { this.x = newX; this.y = newY; }
+    hitTest(px, py) { return false; }
 }
 
 class Rect extends Shape {
@@ -27,14 +28,13 @@ class Rect extends Shape {
         this.height = height;
     }
 
-    render(offset) {
-        return App.SvgHelper.createElement("rect", {
-            x: offset.x + this.x, y: offset.y + this.y,
-            width: this.width, height: this.height, fill: this.fill
-        });
-    }
-
+    accept(visitor, offset) { return visitor.visitRect(this, offset); }
     getSize() { return { width: this.x + this.width, height: this.y + this.height }; }
+
+    hitTest(px, py) {
+        return px >= this.x && px <= this.x + this.width &&
+               py >= this.y && py <= this.y + this.height;
+    }
 }
 
 class Circle extends Shape {
@@ -43,13 +43,13 @@ class Circle extends Shape {
         this.radius = radius;
     }
 
-    render(offset) {
-        return App.SvgHelper.createElement("circle", {
-            cx: offset.x + this.x, cy: offset.y + this.y, r: this.radius, fill: this.fill
-        });
-    }
-
+    accept(visitor, offset) { return visitor.visitCircle(this, offset); }
     getSize() { return { width: this.x + this.radius * 2, height: this.y + this.radius * 2 }; }
+
+    hitTest(px, py) {
+        const dx = px - this.x, dy = py - this.y;
+        return dx * dx + dy * dy <= this.radius * this.radius;
+    }
 }
 
 class Ellipse extends Shape {
@@ -59,13 +59,13 @@ class Ellipse extends Shape {
         this.ry = ry;
     }
 
-    render(offset) {
-        return App.SvgHelper.createElement("ellipse", {
-            cx: offset.x + this.x, cy: offset.y + this.y, rx: this.rx, ry: this.ry, fill: this.fill
-        });
-    }
-
+    accept(visitor, offset) { return visitor.visitEllipse(this, offset); }
     getSize() { return { width: this.x + this.rx * 2, height: this.y + this.ry * 2 }; }
+
+    hitTest(px, py) {
+        const dx = (px - this.x) / this.rx, dy = (py - this.y) / this.ry;
+        return dx * dx + dy * dy <= 1;
+    }
 }
 
 class TextShape extends Shape {
@@ -75,19 +75,14 @@ class TextShape extends Shape {
         this.alignmentBaseline = alignmentBaseline;
     }
 
-    render(offset) {
-        return App.SvgHelper.createElement("text", {
-            x: offset.x + this.x, y: offset.y + this.y, fill: this.fill,
-            "alignment-baseline": this.alignmentBaseline,
-            textContent: this.text
-        });
-    }
-
-    _measureWidth() {
-        return this.text.length * 7.2;
-    }
-
+    accept(visitor, offset) { return visitor.visitText(this, offset); }
+    _measureWidth() { return this.text.length * 7.2; }
     getSize() { return { width: this.x + this._measureWidth(), height: this.y + 16 }; }
+
+    hitTest(px, py) {
+        return px >= this.x && px <= this.x + this._measureWidth() &&
+               py >= this.y - 16 && py <= this.y;
+    }
 }
 
 class Line extends Shape {
@@ -101,14 +96,7 @@ class Line extends Shape {
         this.strokeWidth = strokeWidth;
     }
 
-    render(offset) {
-        return App.SvgHelper.createElement("line", {
-            x1: this.x1 + offset.x, y1: this.y1 + offset.y,
-            x2: this.x2 + offset.x, y2: this.y2 + offset.y,
-            stroke: this.stroke, "stroke-width": this.strokeWidth
-        });
-    }
-
+    accept(visitor, offset) { return visitor.visitLine(this, offset); }
     getAnchor() { return { x: this.x1, y: this.y1 }; }
 
     applyDrag(newX, newY) {
@@ -126,11 +114,7 @@ class Polygon extends Shape {
         this.points = points;
     }
 
-    render(offset) {
-        const pts = this.points.map(p => `${p.x + offset.x},${p.y + offset.y}`).join(" ");
-        return App.SvgHelper.createElement("polygon", { points: pts, fill: this.fill });
-    }
-
+    accept(visitor, offset) { return visitor.visitPolygon(this, offset); }
     getAnchor() { return this.points[0] ?? { x: 0, y: 0 }; }
 
     applyDrag(newX, newY) {
@@ -154,14 +138,7 @@ class Polyline extends Shape {
         this.strokeWidth = strokeWidth;
     }
 
-    render(offset) {
-        const pts = this.points.map(p => `${p.x + offset.x},${p.y + offset.y}`).join(" ");
-        return App.SvgHelper.createElement("polyline", {
-            points: pts, stroke: this.stroke,
-            "stroke-width": this.strokeWidth, fill: this.fill
-        });
-    }
-
+    accept(visitor, offset) { return visitor.visitPolyline(this, offset); }
     getAnchor() { return this.points[0] ?? { x: 0, y: 0 }; }
 
     applyDrag(newX, newY) {

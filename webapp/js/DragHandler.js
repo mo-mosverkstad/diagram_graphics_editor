@@ -1,8 +1,8 @@
 window.App = window.App || {};
 
 App.DragHandler = class DragHandler {
-    constructor(svg, renderer) {
-        this.svg = svg;
+    constructor(el, renderer) {
+        this.el = el;
         this.renderer = renderer;
         this.selected = null;
         this.offsetX = 0;
@@ -11,16 +11,17 @@ App.DragHandler = class DragHandler {
     }
 
     _bind() {
-        this.svg.addEventListener("mousedown", (e) => this._onDown(e));
-        this.svg.addEventListener("mousemove", (e) => this._onMove(e));
-        this.svg.addEventListener("mouseup", () => this.selected = null);
-        this.svg.addEventListener("mouseleave", () => this.selected = null);
+        this.el.addEventListener("mousedown", (e) => this._onDown(e));
+        this.el.addEventListener("mousemove", (e) => this._onMove(e));
+        this.el.addEventListener("mouseup", () => this.selected = null);
+        this.el.addEventListener("mouseleave", () => this.selected = null);
     }
 
     _onDown(e) {
-        if (!e.target.__rootNode) return;
-        this.selected = e.target.__rootNode;
-        const { x, y } = this.selected.getAnchor();
+        const shape = this.renderer.findShapeAt(e);
+        if (!shape) return;
+        this.selected = shape;
+        const { x, y } = shape.getAnchor();
         this.offsetX = e.offsetX - x;
         this.offsetY = e.offsetY - y;
     }
