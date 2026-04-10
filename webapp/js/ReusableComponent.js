@@ -7,11 +7,13 @@ App.defineLayout = function(name, { params = {}, body = [], direction = "stack" 
 };
 
 App.ReusableComponent = class ReusableComponent extends App.Shape {
-    constructor({ template, ...overrides }) {
-        super(overrides);
+    constructor({ template, fill = "none", stroke = null, strokeWidth = 1, ...overrides }) {
+        super({ ...overrides, fill });
         this.template = template;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
         this.overrides = {};
-        const shapeKeys = ["x", "y", "fill", "wrapWidth", "wrapHeight"];
+        const shapeKeys = ["x", "y", "fill", "wrapWidth", "wrapHeight", "stroke", "strokeWidth"];
         for (const [k, v] of Object.entries(overrides)) {
             if (!shapeKeys.includes(k)) this.overrides[k] = v;
         }

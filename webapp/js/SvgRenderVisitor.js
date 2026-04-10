@@ -68,13 +68,28 @@ App.SvgRenderVisitor = class SvgRenderVisitor extends App.RenderVisitor {
         });
     }
 
+    _svgContainerBg(container, offset) {
+        if (!this._hasBackground(container)) return null;
+        const b = this._getBounds(container, offset);
+        const attrs = { x: b.x, y: b.y, width: b.w, height: b.h, fill: "none" };
+        if (container.fill && container.fill !== "none") attrs.fill = container.fill;
+        if (container.stroke) {
+            attrs.stroke = container.stroke;
+            attrs["stroke-width"] = container.strokeWidth;
+        }
+        return svgEl("rect", attrs);
+    }
+
     visitGroup(group, offset) {
         group._computeSize();
         const childOffset = { x: offset.x + group.x, y: offset.y + group.y };
-        const els = group.children.flatMap(child => {
+        const els = [];
+        const bg = this._svgContainerBg(group, offset);
+        if (bg) els.push(bg);
+        for (const child of group.children) {
             const el = child.accept(this, childOffset);
-            return Array.isArray(el) ? el : [el];
-        });
+            els.push(...(Array.isArray(el) ? el : [el]));
+        }
         return svgGroup(els);
     }
 
@@ -83,6 +98,8 @@ App.SvgRenderVisitor = class SvgRenderVisitor extends App.RenderVisitor {
         const baseX = offset.x + table.x;
         const baseY = offset.y + table.y;
         const els = [];
+        const bg = this._svgContainerBg(table, offset);
+        if (bg) els.push(bg);
         let cy = 0;
 
         for (let r = 0; r < table.rows; r++) {
@@ -115,6 +132,8 @@ App.SvgRenderVisitor = class SvgRenderVisitor extends App.RenderVisitor {
 
         const baseOffset = { x: offset.x + comp.x, y: offset.y + comp.y };
         const els = [];
+        const bg = this._svgContainerBg(comp, offset);
+        if (bg) els.push(bg);
         let cursorY = 0;
 
         for (const child of children) {
@@ -132,6 +151,8 @@ App.SvgRenderVisitor = class SvgRenderVisitor extends App.RenderVisitor {
         const children = comp._computeSize();
         const baseOffset = { x: offset.x + comp.x, y: offset.y + comp.y };
         const els = [];
+        const bg = this._svgContainerBg(comp, offset);
+        if (bg) els.push(bg);
         let cursorY = 0;
         for (const child of children) {
             const el = child.accept(this, { x: baseOffset.x, y: baseOffset.y + cursorY });

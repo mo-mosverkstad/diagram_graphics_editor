@@ -8,10 +8,12 @@ App.VirtualComponent = class VirtualComponent extends App.Shape {
      *   Optionally include a `key` field for stable identity across reorders.
      * @param {string} [opts.direction="stack"] - "stack" (overlay) or "vertical"
      */
-    constructor({ dataSource, direction = "stack", ...rest } = {}) {
-        super(rest);
+    constructor({ dataSource, direction = "stack", fill = "none", stroke = null, strokeWidth = 1, ...rest } = {}) {
+        super({ ...rest, fill });
         this.dataSource = dataSource;
         this.direction = direction;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
         this._prevSnapshot = null; // cached descriptor array
         this._cache = null;        // cached materialized children
     }

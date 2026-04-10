@@ -20,6 +20,9 @@ App.components = [
 
     new App.Group({
         x: 200, y: 100,
+        fill: "lightyellow",
+        stroke: "gray",
+        strokeWidth: 2,
         children: [
             new App.Rect({ width: 100, height: 50, fill: "green" }),
             new App.Circle({ x: 120, y: 25, radius: 20, fill: "orange" })

@@ -1,6 +1,15 @@
 window.App = window.App || {};
 
 App.RenderVisitor = class RenderVisitor {
+    _hasBackground(container) {
+        return (container.fill && container.fill !== "none") || container.stroke;
+    }
+    _getBounds(container, offset) {
+        const s = container.getSize();
+        const w = s.width - container.x;
+        const h = s.height - container.y;
+        return { x: offset.x + container.x, y: offset.y + container.y, w, h };
+    }
     visitRect(shape, offset) { throw new Error("Not implemented"); }
     visitCircle(shape, offset) { throw new Error("Not implemented"); }
     visitEllipse(shape, offset) { throw new Error("Not implemented"); }

@@ -1,9 +1,11 @@
 window.App = window.App || {};
 
 class Group extends App.Shape {
-    constructor({ children = [], ...rest } = {}) {
-        super(rest);
+    constructor({ children = [], fill = "none", stroke = null, strokeWidth = 1, ...rest } = {}) {
+        super({ ...rest, fill });
         this.children = children;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
     }
 
     _computeSize() {
@@ -33,14 +35,16 @@ class Group extends App.Shape {
 }
 
 class Table extends App.Shape {
-    constructor({ cellWidth = 50, cellHeight = 50, gap = 0, wrapColWidth = false, wrapColHeight = false, children = [[]], ...rest } = {}) {
-        super(rest);
+    constructor({ cellWidth = 50, cellHeight = 50, gap = 0, wrapColWidth = false, wrapColHeight = false, children = [[]], fill = "none", stroke = null, strokeWidth = 1, ...rest } = {}) {
+        super({ ...rest, fill });
         this.cellWidth = cellWidth;
         this.cellHeight = cellHeight;
         this.gap = gap;
         this.wrapColWidth = wrapColWidth;
         this.wrapColHeight = wrapColHeight;
         this.children = children;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
     }
 
     get rows() { return this.children.length; }
