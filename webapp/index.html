@@ -16,6 +16,8 @@
 <svg id="mySVG" width="800" height="600"></svg>
 <canvas id="myCanvas" width="800" height="600" style="display:none"></canvas>
 
+<!-- ===== Graphics Framework ===== -->
+
 <!-- Shapes -->
 <script src="js/renderers/RenderVisitor.js"></script>
 <script src="js/shapes/Shape.js"></script>
@@ -43,9 +45,16 @@
 <script src="js/handlers/DragHandler.js"></script>
 <script src="js/data/Store.js"></script>
 
-<!-- App -->
-<script src="js/ast.js"></script>
-<script src="js/main.js"></script>
+<!-- ===== Demo / Prototype ===== -->
+<script src="demo/ast.js"></script>
+
+<!-- TikZ Application Layer -->
+<script src="tikz/TikzAst.js"></script>
+<script src="tikz/TikzMapper.js"></script>
+<script src="tikz/tikz_demo.js"></script>
+
+<!-- Entry Point -->
+<script src="demo/main.js"></script>
 
 </body>
 </html>

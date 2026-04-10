@@ -31,7 +31,6 @@ App.components = [
 
     new App.Table({
         x: 100, y: 250,
-        // cellWidth: 80, cellHeight: 80, gap: 10,
         wrapColWidth: true, wrapColHeight: true, gap: 0,
         children: [
             [new App.Rect({ width: 60, height: 60, fill: "red" }), new App.Rect({ width: 60, height: 60, fill: "blue" }), new App.Circle({ radius: 25, fill: "orange" })],
