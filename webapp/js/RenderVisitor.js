@@ -11,4 +11,5 @@ App.RenderVisitor = class RenderVisitor {
     visitGroup(group, offset) { throw new Error("Not implemented"); }
     visitTable(table, offset) { throw new Error("Not implemented"); }
     visitReusableComponent(comp, offset) { throw new Error("Not implemented"); }
+    visitVirtualComponent(comp, offset) { throw new Error("Not implemented"); }
 };

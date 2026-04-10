@@ -111,4 +111,14 @@ App.CanvasRenderVisitor = class CanvasRenderVisitor extends App.RenderVisitor {
             }
         }
     }
+
+    visitVirtualComponent(comp, offset) {
+        const children = comp._computeSize();
+        const baseOffset = { x: offset.x + comp.x, y: offset.y + comp.y };
+        let cursorY = 0;
+        for (const child of children) {
+            child.accept(this, { x: baseOffset.x, y: baseOffset.y + cursorY });
+            if (comp.direction === "vertical") cursorY += child.getSize().height;
+        }
+    }
 };

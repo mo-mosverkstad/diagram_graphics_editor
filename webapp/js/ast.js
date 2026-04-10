@@ -8,6 +8,12 @@ App.defineLayout("Button", {
     ]
 });
 
+// External mutable data source — VirtualComponent reads from this at render time
+App.externalData = [
+    { type: "Rect", width: 80, height: 30, fill: "tomato" },
+    { type: "Circle", radius: 15, fill: "dodgerblue" },
+];
+
 App.components = [
     new App.Circle({ x: 100, y: 100, radius: 40, fill: "blue" }),
 
@@ -31,5 +37,11 @@ App.components = [
 
     new App.ReusableComponent({ template: "Button", x: 400, y: 100, text: "Drag me! More text more text.", wrapWidth: true}),
     new App.ReusableComponent({ template: "Button", x: 100, y: 100, text: "Drag me! Button", wrapWidth: true, wrapHeight: true}),
-    new App.Line({ x1: 100, y1: 100, x2: 200, y2: 200 })
+    new App.Line({ x1: 100, y1: 100, x2: 200, y2: 200 }),
+
+    // VirtualComponent: no children stored — reads App.externalData each render
+    new App.VirtualComponent({
+        x: 500, y: 250, direction: "vertical",
+        dataSource: () => App.externalData
+    })
 ];

@@ -127,4 +127,17 @@ App.SvgRenderVisitor = class SvgRenderVisitor extends App.RenderVisitor {
         }
         return svgGroup(els);
     }
+
+    visitVirtualComponent(comp, offset) {
+        const children = comp._computeSize();
+        const baseOffset = { x: offset.x + comp.x, y: offset.y + comp.y };
+        const els = [];
+        let cursorY = 0;
+        for (const child of children) {
+            const el = child.accept(this, { x: baseOffset.x, y: baseOffset.y + cursorY });
+            els.push(...(Array.isArray(el) ? el : [el]));
+            if (comp.direction === "vertical") cursorY += child.getSize().height;
+        }
+        return svgGroup(els);
+    }
 };
