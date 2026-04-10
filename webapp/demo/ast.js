@@ -11,8 +11,8 @@ App.defineLayout("Button", {
 // External mutable data — Store wraps it so mutations auto-trigger render
 App.shapeStore = null; // initialized in main.js after renderer exists
 App._rawShapeData = [
-    { type: "Rect", width: 80, height: 30, fill: "tomato" },
-    { type: "Circle", radius: 15, fill: "dodgerblue" },
+    new App.Rect({ width: 80, height: 30, fill: "tomato" }),
+    new App.Circle({ radius: 15, fill: "dodgerblue" }),
 ];
 
 App.components = [
@@ -45,6 +45,6 @@ App.components = [
     // VirtualComponent: reads from store - mutations auto-render
     new App.VirtualComponent({
         x: 500, y: 250, direction: "vertical",
-        dataSource: () => App.shapeStore ? App.shapeStore.data : App._rawShapeData
+        dataSource: () => App.shapeStore ? [...App.shapeStore.data] : App._rawShapeData
     })
 ];

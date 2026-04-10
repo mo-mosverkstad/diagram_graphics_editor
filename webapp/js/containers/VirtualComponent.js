@@ -3,9 +3,7 @@ window.App = window.App || {};
 App.VirtualComponent = class VirtualComponent extends App.Shape {
     /**
      * @param {Object} opts
-     * @param {Function} opts.dataSource - Returns an array of shape descriptors.
-     *   Each descriptor: { type: "Rect", width: 60, fill: "red", ... }
-     *   Optionally include a `key` field for stable identity across reorders.
+     * @param {Function} opts.dataSource - Returns an array of Shape instances.
      * @param {string} [opts.direction="stack"] - "stack" (overlay) or "vertical"
      */
     constructor({ dataSource, direction = "stack", fill = "none", stroke = null, strokeWidth = 1, ...rest } = {}) {
@@ -14,53 +12,10 @@ App.VirtualComponent = class VirtualComponent extends App.Shape {
         this.direction = direction;
         this.stroke = stroke;
         this.strokeWidth = strokeWidth;
-        this._prevSnapshot = null;
-        this._cache = null;
-    }
-
-    _reconcile() {
-        const descriptors = this.dataSource();
-        if (this._prevSnapshot && this._diffEqual(this._prevSnapshot, descriptors)) {
-            return this._cache;
-        }
-        const oldByKey = new Map();
-        if (this._cache && this._prevSnapshot) {
-            for (let i = 0; i < this._prevSnapshot.length; i++) {
-                const key = this._prevSnapshot[i].key ?? i;
-                oldByKey.set(key, { desc: this._prevSnapshot[i], child: this._cache[i] });
-            }
-        }
-        const children = descriptors.map((desc, i) => {
-            const key = desc.key ?? i;
-            const old = oldByKey.get(key);
-            if (old && this._shallowEqual(old.desc, desc)) return old.child;
-            const { type, key: _k, ...props } = desc;
-            return new App[type](props);
-        });
-        this._prevSnapshot = descriptors.map(d => ({ ...d }));
-        this._cache = children;
-        return children;
-    }
-
-    _diffEqual(a, b) {
-        if (a.length !== b.length) return false;
-        for (let i = 0; i < a.length; i++) {
-            if (!this._shallowEqual(a[i], b[i])) return false;
-        }
-        return true;
-    }
-
-    _shallowEqual(a, b) {
-        const ka = Object.keys(a), kb = Object.keys(b);
-        if (ka.length !== kb.length) return false;
-        for (const k of ka) {
-            if (a[k] !== b[k]) return false;
-        }
-        return true;
     }
 
     _computeSize(children) {
-        children = children || this._reconcile();
+        children = children || this.dataSource();
         let w = 0, h = 0;
         for (const child of children) {
             const s = child.getSize();

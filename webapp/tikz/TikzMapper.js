@@ -22,32 +22,32 @@ Tikz.Mapper = class Mapper {
 
         if (this._isNode(last) && last.type === "circle") {
             const c = node.children[0];
-            return { type: "Circle", x: c.x * this.scale, y: c.y * this.scale,
-                radius: (last.opts.radius || 1) * this.scale, fill: "none", stroke: color, strokeWidth: width };
+            return new App.Circle({ x: c.x * this.scale, y: c.y * this.scale,
+                radius: (last.opts.radius || 1) * this.scale, fill: "none" });
         }
         if (this._isNode(last) && last.type === "ellipse") {
             const c = node.children[0];
-            return { type: "Ellipse", x: c.x * this.scale, y: c.y * this.scale,
-                rx: (last.opts.xRadius || 1) * this.scale, ry: (last.opts.yRadius || 1) * this.scale, fill: "none" };
+            return new App.Ellipse({ x: c.x * this.scale, y: c.y * this.scale,
+                rx: (last.opts.xRadius || 1) * this.scale, ry: (last.opts.yRadius || 1) * this.scale, fill: "none" });
         }
         if (this._isNode(last) && last.type === "rectangle") {
             const f = last.opts.from, t = last.opts.to;
-            return { type: "Rect",
+            return new App.Rect({
                 x: Math.min(f.x, t.x) * this.scale, y: Math.min(f.y, t.y) * this.scale,
-                width: Math.abs(t.x - f.x) * this.scale, height: Math.abs(t.y - f.y) * this.scale, fill: "none" };
+                width: Math.abs(t.x - f.x) * this.scale, height: Math.abs(t.y - f.y) * this.scale, fill: "none" });
         }
 
         const coords = node.children.filter(c => !this._isNode(c));
         if (coords.length === 2) {
-            return { type: "Line",
+            return new App.Line({
                 x1: coords[0].x * this.scale, y1: coords[0].y * this.scale,
                 x2: coords[1].x * this.scale, y2: coords[1].y * this.scale,
-                stroke: color, strokeWidth: width };
+                stroke: color, strokeWidth: width });
         }
         if (coords.length > 2) {
-            return { type: "Polyline",
+            return new App.Polyline({
                 points: coords.map(c => ({ x: c.x * this.scale, y: c.y * this.scale })),
-                stroke: color, strokeWidth: width };
+                stroke: color, strokeWidth: width });
         }
         return [];
     }
@@ -58,20 +58,20 @@ Tikz.Mapper = class Mapper {
 
         if (this._isNode(last) && last.type === "circle") {
             const c = node.children[0];
-            return { type: "Circle", x: c.x * this.scale, y: c.y * this.scale,
-                radius: (last.opts.radius || 1) * this.scale, fill: color };
+            return new App.Circle({ x: c.x * this.scale, y: c.y * this.scale,
+                radius: (last.opts.radius || 1) * this.scale, fill: color });
         }
         if (this._isNode(last) && last.type === "rectangle") {
             const f = last.opts.from, t = last.opts.to;
-            return { type: "Rect",
+            return new App.Rect({
                 x: Math.min(f.x, t.x) * this.scale, y: Math.min(f.y, t.y) * this.scale,
-                width: Math.abs(t.x - f.x) * this.scale, height: Math.abs(t.y - f.y) * this.scale, fill: color };
+                width: Math.abs(t.x - f.x) * this.scale, height: Math.abs(t.y - f.y) * this.scale, fill: color });
         }
 
         const coords = node.children.filter(c => !this._isNode(c));
         if (coords.length >= 3) {
-            return { type: "Polygon",
-                points: coords.map(c => ({ x: c.x * this.scale, y: c.y * this.scale })), fill: color };
+            return new App.Polygon({
+                points: coords.map(c => ({ x: c.x * this.scale, y: c.y * this.scale })), fill: color });
         }
         return [];
     }
@@ -79,8 +79,8 @@ Tikz.Mapper = class Mapper {
     _filldraw(node) { return this._fill(node); }
 
     _node(node) {
-        return { type: "TextShape",
+        return new App.TextShape({
             x: (node.opts.x || 0) * this.scale, y: (node.opts.y || 0) * this.scale,
-            text: node.opts.text || "", fill: node.opts.color || "black", alignmentBaseline: "hanging" };
+            text: node.opts.text || "", fill: node.opts.color || "black", alignmentBaseline: "hanging" });
     }
 };
