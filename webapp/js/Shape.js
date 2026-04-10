@@ -19,6 +19,26 @@ class Shape {
     getAnchor() { return { x: this.x, y: this.y }; }
     applyDrag(newX, newY) { this.x = newX; this.y = newY; }
     hitTest(px, py) { return false; }
+
+    static _ptSegDist(px, py, x1, y1, x2, y2) {
+        const dx = x2 - x1, dy = y2 - y1;
+        const lenSq = dx * dx + dy * dy;
+        let t = lenSq ? ((px - x1) * dx + (py - y1) * dy) / lenSq : 0;
+        t = Math.max(0, Math.min(1, t));
+        const cx = x1 + t * dx, cy = y1 + t * dy;
+        return Math.hypot(px - cx, py - cy);
+    }
+
+    static _ptInPolygon(px, py, points) {
+        let inside = false;
+        for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+            const xi = points[i].x, yi = points[i].y;
+            const xj = points[j].x, yj = points[j].y;
+            if ((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi)
+                inside = !inside;
+        }
+        return inside;
+    }
 }
 
 class Rect extends Shape {
@@ -80,8 +100,9 @@ class TextShape extends Shape {
     getSize() { return { width: this.x + this._measureWidth(), height: this.y + 16 }; }
 
     hitTest(px, py) {
+        const top = this.alignmentBaseline === "hanging" ? this.y : this.y - 16;
         return px >= this.x && px <= this.x + this._measureWidth() &&
-               py >= this.y - 16 && py <= this.y;
+               py >= top && py <= top + 16;
     }
 }
 
@@ -106,6 +127,10 @@ class Line extends Shape {
     }
 
     getSize() { return { width: Math.max(this.x1, this.x2), height: Math.max(this.y1, this.y2) }; }
+
+    hitTest(px, py) {
+        return Shape._ptSegDist(px, py, this.x1, this.y1, this.x2, this.y2) <= Math.max(this.strokeWidth, 5);
+    }
 }
 
 class Polygon extends Shape {
@@ -127,6 +152,10 @@ class Polygon extends Shape {
             width: Math.max(...this.points.map(p => p.x)),
             height: Math.max(...this.points.map(p => p.y))
         };
+    }
+
+    hitTest(px, py) {
+        return this.points.length >= 3 && Shape._ptInPolygon(px, py, this.points);
     }
 }
 
@@ -151,6 +180,15 @@ class Polyline extends Shape {
             width: Math.max(...this.points.map(p => p.x)),
             height: Math.max(...this.points.map(p => p.y))
         };
+    }
+
+    hitTest(px, py) {
+        const tol = Math.max(this.strokeWidth, 5);
+        for (let i = 0; i < this.points.length - 1; i++) {
+            if (Shape._ptSegDist(px, py, this.points[i].x, this.points[i].y,
+                this.points[i + 1].x, this.points[i + 1].y) <= tol) return true;
+        }
+        return false;
     }
 }
 

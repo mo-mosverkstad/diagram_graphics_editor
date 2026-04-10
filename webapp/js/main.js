@@ -17,6 +17,7 @@ function init(backend) {
         renderer = new App.SvgRenderer(svgElem, App.components);
     }
     renderer.render();
+    App.shapeStore = new App.Store(App._rawShapeData, () => renderer.render());
     dragHandler = new App.DragHandler(backend === "canvas" ? canvasEl : svgElem, renderer);
     toggleBtn.textContent = "Switch to " + (backend === "canvas" ? "SVG" : "Canvas");
 }
