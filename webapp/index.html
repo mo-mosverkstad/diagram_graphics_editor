@@ -16,16 +16,34 @@
 <svg id="mySVG" width="800" height="600"></svg>
 <canvas id="myCanvas" width="800" height="600" style="display:none"></canvas>
 
-<script src="js/RenderVisitor.js"></script>
-<script src="js/Shape.js"></script>
-<script src="js/Container.js"></script>
-<script src="js/ReusableComponent.js"></script>
-<script src="js/VirtualComponent.js"></script>
-<script src="js/SvgRenderVisitor.js"></script>
-<script src="js/CanvasRenderVisitor.js"></script>
-<script src="js/Renderer.js"></script>
-<script src="js/DragHandler.js"></script>
-<script src="js/Store.js"></script>
+<!-- Shapes -->
+<script src="js/renderers/RenderVisitor.js"></script>
+<script src="js/shapes/Shape.js"></script>
+<script src="js/shapes/Rect.js"></script>
+<script src="js/shapes/Circle.js"></script>
+<script src="js/shapes/Ellipse.js"></script>
+<script src="js/shapes/TextShape.js"></script>
+<script src="js/shapes/Line.js"></script>
+<script src="js/shapes/Polygon.js"></script>
+<script src="js/shapes/Polyline.js"></script>
+
+<!-- Containers -->
+<script src="js/containers/Group.js"></script>
+<script src="js/containers/Table.js"></script>
+<script src="js/containers/ReusableComponent.js"></script>
+<script src="js/containers/VirtualComponent.js"></script>
+
+<!-- Renderers -->
+<script src="js/renderers/SvgRenderVisitor.js"></script>
+<script src="js/renderers/CanvasRenderVisitor.js"></script>
+<script src="js/renderers/SvgRenderer.js"></script>
+<script src="js/renderers/CanvasRenderer.js"></script>
+
+<!-- Handlers & Data -->
+<script src="js/handlers/DragHandler.js"></script>
+<script src="js/data/Store.js"></script>
+
+<!-- App -->
 <script src="js/ast.js"></script>
 <script src="js/main.js"></script>
 

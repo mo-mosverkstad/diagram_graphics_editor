@@ -1,15 +1,5 @@
 window.App = window.App || {};
 
-/**
- * A minimal reactive store using Proxy.
- * Wraps a plain array so that any mutation (push, splice, index set, etc.)
- * automatically schedules a render on the next microtask.
- *
- * Usage:
- *   const store = new App.Store([...], () => renderer.render());
- *   store.data.push({ type: "Rect", width: 50, height: 50, fill: "red" });
- *   // render happens automatically — no manual call needed
- */
 App.Store = class Store {
     constructor(initial, onChanged) {
         this._onChanged = onChanged;

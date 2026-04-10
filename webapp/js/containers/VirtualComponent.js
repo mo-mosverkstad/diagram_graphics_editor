@@ -14,8 +14,8 @@ App.VirtualComponent = class VirtualComponent extends App.Shape {
         this.direction = direction;
         this.stroke = stroke;
         this.strokeWidth = strokeWidth;
-        this._prevSnapshot = null; // cached descriptor array
-        this._cache = null;        // cached materialized children
+        this._prevSnapshot = null;
+        this._cache = null;
     }
 
     _reconcile() {
@@ -23,7 +23,6 @@ App.VirtualComponent = class VirtualComponent extends App.Shape {
         if (this._prevSnapshot && this._diffEqual(this._prevSnapshot, descriptors)) {
             return this._cache;
         }
-        // Build a key→child map from previous cache for reuse
         const oldByKey = new Map();
         if (this._cache && this._prevSnapshot) {
             for (let i = 0; i < this._prevSnapshot.length; i++) {
